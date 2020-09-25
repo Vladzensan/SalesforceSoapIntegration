@@ -1,6 +1,7 @@
 public with sharing class SensorEventHelper {
     private static final Integer DIMENSIONS_NUM = 3;
-    private static final String ERROR_STR = 'Wrong number of coordinates in list';
+    private static final String COORDS_ERROR = 'Wrong number of coordinates in list';
+    private static final String ACCOUNT_ERROR = 'Account not present';
     
     public static void insertNewEvents(SensorEventsData sensorsData) {
         checkDataValidity(sensorsData);
@@ -11,11 +12,17 @@ public with sharing class SensorEventHelper {
     }
 
     private static Sensor__c getOrAddSensor(String sensorName, Id accountId) {
-        Sensor__c relatedSensor = [SELECT Id FROM Sensor__c WHERE (Name = :sensorName) AND (Account_Id__c = :accountId) LIMIT 1];
+        List<Sensor__c> sensorList = [SELECT Id FROM Sensor__c WHERE (Name = :sensorName) AND (Account_Id__c = :accountId) LIMIT 1];
 
-        if(relatedSensor == null) {
+        Sensor__c relatedSensor;
+
+        if(sensorList.size() == 0) {
+            checkAccountPresent(accountId);
+
             relatedSensor = new Sensor__c(Name = sensorName, Account_Id__c = accountId);
             insert relatedSensor;
+        } else {
+            relatedSensor = sensorList[0];
         }
 
         return relatedSensor;
@@ -59,9 +66,16 @@ public with sharing class SensorEventHelper {
         return eventList;
     }
 
+    private static void checkAccountPresent(Id accountId) {
+        List<Account> accs = [SELECT Id FROM Account WHERE Id= :accountId];
+        if(accs.size() == 0) {
+            throw new IllegalArgumentException(ACCOUNT_ERROR + ': ' + accountId);
+        }
+    }
+
     private static void checkDataValidity(SensorEventsData sensorsData) {
         if(sensorsData.eventsCoords.size() == 0 || Math.mod(sensorsData.eventsCoords.size(), DIMENSIONS_NUM) != 0) {
-            throw new IllegalArgumentException(ERROR_STR);
+            throw new IllegalArgumentException(COORDS_ERROR);
         }
     }
 }
