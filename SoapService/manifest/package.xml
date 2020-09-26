@@ -8,5 +8,13 @@
         <members>Sensor_Event__c</members>
         <name>CustomObject</name>
     </types>
+     <types>
+        <members>*</members>
+        <name>ConnectedApp</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>CorsWhitelistOrigin</name>
+    </types>
     <version>49.0</version>
 </Package>
