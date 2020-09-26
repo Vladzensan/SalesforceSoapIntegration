@@ -7,11 +7,17 @@ public with sharing class SensorEventHelper {
         checkDataValidity(sensorsData);
         
         Sensor__c relatedSensor = getOrAddSensor(sensorsData.sensorId, sensorsData.accountId);
-        Sensor_Event__c lastEvent = [SELECT Id FROM Sensor_Event__c WHERE Next_Event__c = null LIMIT 1];
+        List<Sensor_Event__c> events = [SELECT Id FROM Sensor_Event__c WHERE Next_Event__c = null LIMIT 1];
+        Sensor_Event__c lastEvent = null;
+
+        if(events.size() > 0) { 
+            lastEvent = events[0];
+        }
+        
         buildEventChain(sensorsData.eventsCoords, relatedSensor, lastEvent);
     }
 
-    private static Sensor__c getOrAddSensor(String sensorName, Id accountId) {
+    private static Sensor__c getOrAddSensor(String sensorName, String accountId) {
         List<Sensor__c> sensorList = [SELECT Id FROM Sensor__c WHERE (Name = :sensorName) AND (Account_Id__c = :accountId) LIMIT 1];
 
         Sensor__c relatedSensor;
@@ -45,7 +51,7 @@ public with sharing class SensorEventHelper {
             update lastEvent;
         }
 
-        insert eventChain;
+        update eventChain;
 
         return eventChain;
     }
@@ -66,7 +72,7 @@ public with sharing class SensorEventHelper {
         return eventList;
     }
 
-    private static void checkAccountPresent(Id accountId) {
+    private static void checkAccountPresent(String accountId) {
         List<Account> accs = [SELECT Id FROM Account WHERE Id= :accountId];
         if(accs.size() == 0) {
             throw new IllegalArgumentException(ACCOUNT_ERROR + ': ' + accountId);
