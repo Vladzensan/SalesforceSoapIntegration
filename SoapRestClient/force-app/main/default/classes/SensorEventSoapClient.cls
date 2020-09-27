@@ -6,7 +6,7 @@ public with sharing class SensorEventSoapClient {
         SensorEventsData sensorData = new SensorEventsData(accountId, sensorName, coords);
 
         SoapSensorApp.SoapSensorService service = new SoapSensorApp.SoapSensorService();
-        service.endpoint_x = 'callout:SoapService';
+        service.endpoint_x = 'callout:SoapService/services/Soap/class/SoapSensorService';
         service.SessionHeader = new SoapSensorApp.SessionHeader_element();
         service.SessionHeader.sessionId = '{!$Credential.OAuthToken}';
 
