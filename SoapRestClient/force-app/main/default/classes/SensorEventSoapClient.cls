@@ -6,7 +6,7 @@ public with sharing class SensorEventSoapClient {
         SensorEventsData sensorData = new SensorEventsData(accountId, sensorName, coords);
 
         SoapSensorApp.SoapSensorService service = new SoapSensorApp.SoapSensorService();
-        service.endpoint_x = 'https://cunning-koala-cajz4h-dev-ed.lightning.force.com/services/Soap/class/SoapSensorService';
+        service.endpoint_x = 'callout:SoapService';
         service.SessionHeader = new SoapSensorApp.SessionHeader_element();
         service.SessionHeader.sessionId = '{!$Credential.OAuthToken}';
 
